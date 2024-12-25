@@ -29,8 +29,8 @@ int startgame(){
     printf("Choisir une option (1 ou 2) \n");
     scanf("%d",&choix);
     if (choix==1){
-        printf("      1- joueur vs joueur \n");
-        printf("      2- joueur vs machine \n");
+        printf("      1- joueur vsjoueur \n");
+        printf("      2- joueur vsmachine \n");
         printf("Choisir une option (1 ou 2) \n");
         scanf("%d",&choix2);
         displayBoard();
