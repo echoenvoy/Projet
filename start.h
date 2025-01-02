@@ -5,6 +5,9 @@
 
 
 #define SIZE 24
+#define Pions 16 //8 pour chaque joueur 
+
+int joueur1,joueur2;
 
 // Représentation du plateau de jeu
 char board[SIZE] = {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ',
@@ -13,37 +16,20 @@ char board[SIZE] = {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ',
 // Fonction pour initialiser le plateau de jeu
 void initializeBoard() {
     for(int i = 0; i < SIZE; i++) {
-        board[i] = ' ';
-    }
+        board[i] = 'o';}
 }
+void nbrPions(char x,char y,int *A, int *B){
+ *A=0,*B=0;
+   for(int i = 0; i < SIZE; i++){
+      if(board[i]==x)
+         *A++;
+      if(board[i]==y)
+         *B++;
+   }}
 void rules(){
-
+    
 }
-int startgame(){
-    int choix;int choix2;
-    printf("*****  JEU MOULIN  *****\n");
-    printf("  ***     Menu     ***  \n");
-    printf("      1- JOUER \n");
-    printf("      2- Regles \n");
-    printf("      3- Quitter \n");
-    printf("Choisir une option (1 ou 2) \n");
-    scanf("%d",&choix);
-    if (choix==1){
-        printf("      1- joueur vsjoueur \n");
-        printf("      2- joueur vsmachine \n");
-        printf("Choisir une option (1 ou 2) \n");
-        scanf("%d",&choix2);
-        displayBoard();
-        if  (choix2==1)
-            return 11 ;
-        if  (choix2==2)
-            return 12 ;
-        }
-    else 
-        return choix;
-
-}
-
+void quitter(){}
 // Fonction pour afficher le plateau de jeu
 void displayBoard() {
     int ligne =1;
@@ -77,19 +63,30 @@ void displayBoard() {
         ligne++;
     }
 }
-//Définir un joueur aléatoire
-int aleajoueur(){
-    srand(time(NULL));
-    int a=rand();
-    return (a%2==0);
+
+int startgame0(){
+    int choix;int choix2;
+    printf("*****  JEU MOULIN  *****\n");
+    printf("  ***     Menu     ***  \n");
+    printf("      1- JOUER \n");
+    printf("      2- Regles \n");
+    printf("      3- Quitter \n");
+    printf("Choisir une option (1 ou 2) \n");
+    scanf("%d",&choix);
+    if (choix==1){
+        printf("      1- joueur vs joueur \n");
+        printf("      2- joueur vs machine \n");
+        printf("Choisir une option (1 ou 2) \n");
+        scanf("%d",&choix2);
+        initializeBoard();
+        displayBoard();
+        if  (choix2==1)
+            return 11 ;
+        if  (choix2==2)
+            return 12 ;
+        }
+    else 
+        return choix;
+
 }
-/*int main(){
-    initializeBoard();
-    //displayBoard2();
-    for(int i = 0; i < SIZE; i++) {
-        board[i] = 'o';
-    }
-    displayBoard2();
-    //printf("%d", aleajoueur());
-    return 0;
-}*/
+
