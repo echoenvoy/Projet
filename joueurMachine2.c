@@ -2,11 +2,13 @@
 #include <stdlib.h>
 #include <time.h>
 #include "fonctions_de_jeu.h"
-extern int b; //variable globale pour choisir le joueur qui commence
+#include <limits.h> // For INT_MAX
+#include <stdbool.h> // For bool type
 
+extern int b;
 
-void joueurVSordinateurEVOLUE() {
-    choixSymboles(&sj1, &sj2, 1);  // Choix des symboles et détermination de l'ordre
+void joueurVsMachine2() {
+    choixSymboles1(&sj1);  // Choix des symboles et détermination de l'ordre
     afficherCouleursJoueurs();
     Sleep(5000);
     int turn = b;  // 0: Human starts, 1: AI starts
@@ -14,7 +16,7 @@ void joueurVSordinateurEVOLUE() {
     // **Phase de placement**
     for (int i = 0; i < Pions / 2; i++) {
         if (turn == 1) {
-            TourDePlacementMACHINE(sj1, &nbrspions1);
+            TourDePlacementMACHINE(sj1, &nbrspions1); // nbrspions1 est celui du joueur
             TourDePlacement(sj1, 'm', 1, &nbrspions2);
         } else {
             TourDePlacement(sj1, 'm', 1, &nbrspions2);
@@ -23,16 +25,16 @@ void joueurVSordinateurEVOLUE() {
     }
 
     // **Phase de Mouvement**
-        while (!is_win()) {
+        do {
             if (b == 0) {  // Le joueur commence
                 TourDeMvt(sj1, 'm', 1, nbrspions1, &nbrspions2);
                 if (is_win()) break;
-                TourDeMvtMACHINE(sj1, nbrspions2, &nbrspions1);
+                TourDeMvtMACHINE(sj1, &nbrspions1);
             } else {  // L'IA commence
-                TourDeMvtMACHINE(sj1, nbrspions2, &nbrspions1);
+                TourDeMvtMACHINE(sj1, &nbrspions1);
                 if (is_win()) break;
                 TourDeMvt(sj1, 'm', 1, nbrspions1, &nbrspions2);
             }
-        }
+        } while (!is_win());
     
 }
