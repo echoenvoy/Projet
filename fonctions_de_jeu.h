@@ -81,7 +81,7 @@ void captureOpponentPieceAI(char adversarySymbol, int *adversaryPawns);
 int isThreatened(char *board, char adversarySymbol);
 void TourDePlacementMACHINE( char adversarySymbol, int *adversaryPawns) ;
 void TourDeMvtMACHINE(char adversarySymbol, int AiPawns, int *adversaryPawns);
-void isDiffMachine(char* JoueurCaractere);
+void isDiffMachineAndBoard(char* JoueurCaractere);
 
 
 #endif
