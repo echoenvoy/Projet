@@ -82,6 +82,27 @@ int isThreatened(char *board, char adversarySymbol);
 void TourDePlacementMACHINE( char adversarySymbol, int *adversaryPawns) ;
 void TourDeMvtMACHINE(char adversarySymbol, int AiPawns, int *adversaryPawns);
 void isDiffMachineAndBoard(char* JoueurCaractere);
+void choixSymboles1(char *JoueurCaractere);
+int checkAndHandleMoulinMACHINE(int iplace, char adversarySymbol, int *adversaryPawns);
+int machineCapturePion1(char adversarySymbol, int *adversaryPawns);
+int machineCapturePion0(char adversarySymbol, int *adversaryPawns);
+int getBestMovePlacement(char *board, char adversarySymbol);
+int bestcapture1(char *board, char adversarySymbol);
+int bestcapture0(char *board, char adversarySymbol);
+int threatPlacement(char *board, char adversarySymbol, int i);
+int threatMouvement(char *board, char adversarySymbol, int source, int destination);
+int MoulinPossible(char *board, char symbol, int i);
+int doubleMoulinPossible2(char *board, char symbol, int k);
+int PionBloque(int pos, char adversarySymbol, int playerPawns);
+int PionSemi_bloque(char *board, int pos, char adversarySymbol, int adversaryPawns);
+int moulindouble(char playerSymbol, int playerPawns);
+int nearestdesiredPawn(char *board, char Symbol, int targetPos);
+int bfsFindDistance(char *board, int start, int target);
+int MoulinAssure(char *board, char adversarySymbol);
+
+
+
+
 
 
 #endif
