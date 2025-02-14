@@ -96,5 +96,5 @@ void placementAleatoireMachine(char smachine,char shumain,int Machine_Pawns, int
     move(ideplace, iaplace, smachine);
 
     // Verifier et gerer un eventuel moulin
-    checkAndHandleMoulin(iaplace, &itake, shumain, adversaryPawns);
+    checkAndHandleMoulin2(iaplace, &itake, shumain, adversaryPawns);
 }
