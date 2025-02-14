@@ -25,16 +25,16 @@ void joueurVsMachine2() {
     }
 
     // **Phase de Mouvement**
-        do {
-            if (b == 0) {  // Le joueur commence
-                TourDeMvt(sj1, 'm', 1, nbrspions1, &nbrspions2);
-                if (is_win()) break;
+    while (!is_win()){
+        if (b == 0) {  // Le joueur commence
+            TourDeMvt(sj1, 'm', 1, nbrspions1, &nbrspions2);
+            if (nbrspions2 <= 2 || (isBlocked('m') && nbrspions2 != 3)) break;
+            TourDeMvtMACHINE(sj1, &nbrspions1);
+        } else {  // L'IA commence
                 TourDeMvtMACHINE(sj1, &nbrspions1);
-            } else {  // L'IA commence
-                TourDeMvtMACHINE(sj1, &nbrspions1);
-                if (is_win()) break;
+                if (nbrspions1 <= 2 || (isBlocked(sj1) && nbrspions1 != 3)) break;
                 TourDeMvt(sj1, 'm', 1, nbrspions1, &nbrspions2);
-            }
-        } while (!is_win());
+        }
+    }
     
 }
