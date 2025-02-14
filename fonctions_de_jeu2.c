@@ -63,10 +63,9 @@ void Machine_placement(char smachine,char shumain, int *humanPawns) {
     checkAndHandleMoulin2(iplace, &itake, shumain, humanPawns);
 }
 
-
-void placementAleatoireMachine(char smachine,char shumain,int Machine_Pawns, int *adversaryPawns) {
+void placementAleatoireMachine(char smachine, char shumain, int Machine_Pawns, int *adversaryPawns) {
     clear();
-    printf(RED"C'est la phase de Mouvement :\n"RESET);
+    printf(RED "C'est la phase de Mouvement :\n" RESET);
     displayBoard();
 
     int ideplace, iaplace, itake, count;
@@ -74,27 +73,32 @@ void placementAleatoireMachine(char smachine,char shumain,int Machine_Pawns, int
 
     printf("Tour de la machine (%c)\n", smachine);
 
-    if (Machine_Pawns == 3) {
-        printf(YELLOW " La machine a 3 pions,il peut sauter n'importe ou ! \n" RESET);
-    }
-    // Selection d'un pion a deplacer
+    // Sélection du pion à déplacer
     do {
         ideplace = rand() % SIZE;
-        
         count=isValidToMove(ideplace, valides,Machine_Pawns);
 
     }  while (board[ideplace] != smachine || !count );// Vérifier que le pion appartient au joueur et peut bouger
 
 
-    // Selection de la nouvelle position
-    do {
-        iaplace =valides[ rand() % count];
-
-    } while (!isInArray(iaplace, valides, count));
+    if (Machine_Pawns == 3) {
+        // La machine peut se déplacer où elle veut
+        printf(YELLOW " La machine a 3 pions, elle peut sauter n'importe où !\n" RESET);
+        do {
+            iaplace = rand() % SIZE;  // Choisir une position aléatoire
+        } while (board[iaplace] != 'O');  // Vérifier que la case est vide
+    } 
+    else {
+        // Déplacement normal (cases adjacentes seulement)
+        iaplace = valides[rand() % count];  // Choisir une case valide
+    }
 
     // Effectuer le mouvement
     move(ideplace, iaplace, smachine);
+    printf("Machine déplace son pion de %d à %d\n", ideplace, iaplace);
+    Sleep(2000);
 
-    // Verifier et gerer un eventuel moulin
+    // Vérifier et gérer un éventuel moulin
     checkAndHandleMoulin2(iaplace, &itake, shumain, adversaryPawns);
 }
+
