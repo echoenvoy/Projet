@@ -40,6 +40,8 @@ extern int moulinsPrecedents[SIZE];
 
 extern char sj1;
 extern char sj2;
+extern char JoueurCaractere;
+extern char adversarySymbol;
 
 // Fonctions du jeu
 void clear();
@@ -79,6 +81,7 @@ void captureOpponentPieceAI(char adversarySymbol, int *adversaryPawns);
 int isThreatened(char *board, char adversarySymbol);
 void TourDePlacementMACHINE( char adversarySymbol, int *adversaryPawns) ;
 void TourDeMvtMACHINE(char adversarySymbol, int AiPawns, int *adversaryPawns);
+void isDiffMachine(char* JoueurCaractere);
 
 
 #endif
