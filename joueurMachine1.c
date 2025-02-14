@@ -11,9 +11,9 @@ void joueurVsMachine1(){
     for (int i = 0; i < Pions / 2; i++) {
         if (sj1 == 'm') {
             Machine_placement(sj1, sj2, &nbrspions2);  // Placement aléatoire de la machine
-            TourDePlacement(sj2, sj1, 2, &nbrspions2);  // Placement du joueur
+            TourDePlacement(sj2, sj1, 2, &nbrspions1);  // Placement du joueur
         } else {
-            TourDePlacement(sj1, sj2, 1, &nbrspions1);  // Placement du joueur
+            TourDePlacement(sj1, sj2, 1, &nbrspions2);  // Placement du joueur
             Machine_placement(sj2, sj1, &nbrspions1);  // Placement aléatoire de la machine
         }
     }
