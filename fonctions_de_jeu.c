@@ -60,7 +60,7 @@ void choixSymboles(char *sj1,char *sj2,int a){
     printf("le joueur  ,choisir un symbole (un seul caractere):  ");
     scanf(" %c",&sj);
     isValidCharch(&sj);
-    isDiffMachine(&sj);
+    isDiffMachineAndBoard(&sj);
 
     printf("Pour la machine, on choisit le symbole : 'm' \n");;
     if (aleajoueur()==0){
