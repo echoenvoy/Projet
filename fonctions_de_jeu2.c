@@ -83,6 +83,7 @@ void placementAleatoireMachine(char smachine, char shumain, int Machine_Pawns, i
 
     if (Machine_Pawns == 3) {
         // La machine peut se déplacer où elle veut
+        clear();
         printf(YELLOW " La machine a 3 pions, elle peut sauter n'importe où !\n" RESET);
         do {
             iaplace = rand() % SIZE;  // Choisir une position aléatoire
@@ -96,7 +97,7 @@ void placementAleatoireMachine(char smachine, char shumain, int Machine_Pawns, i
     // Effectuer le mouvement
     move(ideplace, iaplace, smachine);
     printf("Machine déplace son pion de %d à %d\n", ideplace, iaplace);
-    Sleep(2000);
+    Sleep(3000);
 
     // Vérifier et gérer un éventuel moulin
     checkAndHandleMoulin2(iaplace, &itake, shumain, adversaryPawns);
