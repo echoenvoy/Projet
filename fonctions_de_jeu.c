@@ -31,6 +31,13 @@ void isValidCharch(char* sj){
         scanf(" %c",sj);
     }
 }
+//Vérifie si le symbole du joueur est différent du symbole de la machine.
+void isDiffMachine(char* sj){
+   if (*sj=='m'){
+        printf("C'est le symbole de la machine, choisissez un autre symbole : ");
+        scanf(" %c", sj);
+    }
+}
 void choixSymboles(char *sj1,char *sj2,int a){
     clear();
     char sjd, sjg, sj;
@@ -53,6 +60,7 @@ void choixSymboles(char *sj1,char *sj2,int a){
     printf("le joueur  ,choisir un symbole (un seul caractere):  ");
     scanf(" %c",&sj);
     isValidCharch(&sj);
+    isDiffMachine(&sj);
 
     printf("Pour la machine, on choisit le symbole : 'm' \n");;
     if (aleajoueur()==0){
