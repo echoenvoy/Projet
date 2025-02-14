@@ -6,6 +6,8 @@
 #include <time.h>
 #include <windows.h>
 #include <wchar.h>
+#include <limits.h> // For INT_MAX
+#include <stdbool.h> // For bool type
 #define RESET   "\033[0m"
 #define RED     "\033[31m"  // Rouge
 #define GREEN   "\033[32m"  // Vert
@@ -29,6 +31,11 @@
 #define SIZE 24
 #define Pions 18 //9 pour chaque joueur 
 
+typedef struct {
+    int from;
+    int to;
+} Move;
+
 // Déclaration des variables globales
 extern int nbrspions1;
 extern int nbrspions2;
@@ -36,12 +43,14 @@ extern char board[SIZE];
 extern int adjacences[SIZE][4];
 extern int lastMove; // Dernière case jouée
 extern int moulinsPrecedents[SIZE];
+extern int b; //variable globale pour choisir le joueur qui commence
+extern int MoulinAssureTableau[2];
+extern int c; // pour savoir si il y a possibilite d'un moulin assure pour l'adversaire
+
 
 
 extern char sj1;
 extern char sj2;
-extern char JoueurCaractere;
-extern char adversarySymbol;
 
 // Fonctions du jeu
 void clear();
@@ -54,8 +63,11 @@ void displayBoard0();
 void displayBoard();
 int startgame0();
 void startgame1();
+void choixSymboles1(char *sj1);
 int aleajoueur();
 void choixSymboles(char *sj1, char *sj2, int a);
+void choixSymboles1(char *sj1);
+void isValidCharch(char* sj);
 void pose(int i, char x);
 void move(int i1, int i2, char x);
 int isValid(int i);
@@ -73,35 +85,29 @@ void Machine_placement(char smachine,char shumain, int *humanPawns) ;
 void placementAleatoireMachine(char smachine,char shumain,int Machine_Pawns, int *adversaryPawns);
 void joueur_humain();
 void joueur_ordinateur();
-void joueur_ordinateurEVOLUE();
-int getBestMove(char *board, char JoueurCaractere);
-int minimax(char *board, int depth, int TOUR, char JoueurCaractere, int alpha, int beta);
-int evaluatePosition(char *board, char JoueurCaractere);
-void captureOpponentPieceAI(char adversarySymbol, int *adversaryPawns);
-int isThreatened(char *board, char adversarySymbol);
-void TourDePlacementMACHINE( char adversarySymbol, int *adversaryPawns) ;
-void TourDeMvtMACHINE(char adversarySymbol, int AiPawns, int *adversaryPawns);
-void isDiffMachineAndBoard(char* JoueurCaractere);
-void choixSymboles1(char *JoueurCaractere);
-int checkAndHandleMoulinMACHINE(int iplace, char adversarySymbol, int *adversaryPawns);
+void joueurVsMachine2();
+int getBestMovePlacement(char *board, char adversarySymbol);
+Move getBestMoveMvt(char *board, char adversarySymbol);
 int machineCapturePion1(char adversarySymbol, int *adversaryPawns);
 int machineCapturePion0(char adversarySymbol, int *adversaryPawns);
-int getBestMovePlacement(char *board, char adversarySymbol);
 int bestcapture1(char *board, char adversarySymbol);
 int bestcapture0(char *board, char adversarySymbol);
+int bestcapture01(char *board, char adversarySymbol);
+
 int threatPlacement(char *board, char adversarySymbol, int i);
-int threatMouvement(char *board, char adversarySymbol, int source, int destination);
-int MoulinPossible(char *board, char symbol, int i);
-int doubleMoulinPossible2(char *board, char symbol, int k);
-int PionBloque(int pos, char adversarySymbol, int playerPawns);
-int PionSemi_bloque(char *board, int pos, char adversarySymbol, int adversaryPawns);
+int threatMouvement(char *board, char playerSymbol, int source, int destination);
+void TourDePlacementMACHINE( char adversarySymbol, int *adversaryPawns) ;
+void TourDeMvtMACHINE(char adversarySymbol, int *adversaryPawns);
+int checkAndHandleMoulinMACHINE(int iplace, char adversarySymbol, int *adversaryPawns);
+int MoulinAssure(char *board, char playerSymbol);
+int MoulinPossible(char *board, char playerSymbol, int i);
 int moulindouble(char playerSymbol, int playerPawns);
+int PionBloque(int pos, char playerSymbol, int playerPawns);
+int PionSemi_bloque(char *board, int pos, char playerSymbol, int playerPawns);
+int doubleMoulinPossible2(char *board, char symbol, int k);
 int nearestdesiredPawn(char *board, char Symbol, int targetPos);
+int furthestdesiredPawn(char *board, char symbol, int targetPos);
 int bfsFindDistance(char *board, int start, int target);
-int MoulinAssure(char *board, char adversarySymbol);
-
-
-
 
 
 
