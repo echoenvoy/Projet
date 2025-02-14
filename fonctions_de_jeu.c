@@ -33,10 +33,12 @@ void isValidCharch(char* sj){
 }
 //Vérifie si le symbole du joueur est différent du symbole de la machine.
 void isDiffMachineAndBoard(char* sj){
-   if (*sj=='m' ||*sj=='O'){
+  do {
         printf("C'est le symbole de la machine/ du plateau, choisissez un autre symbole : ");
         scanf(" %c", sj);
-    }
+        // Clear the input buffer
+        while (getchar() != '\n');
+    } while (*sj == 'm' || *sj == 'O');
 }
 void choixSymboles(char *sj1,char *sj2,int a){
     clear();
