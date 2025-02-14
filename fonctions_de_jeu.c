@@ -47,10 +47,12 @@ void choixSymboles(char *sj1,char *sj2,int a){
     printf("le joueur droite ,choisissez un symbole (un seul caractere):  ");
     scanf(" %c",&sjd);
     isValidCharch(&sjd);
+    isDiffMachineAndBoard(&sjd);
 
     printf("le joueur gauche ,choisissez un symbole (un seul caractere):  ");
     scanf(" %c",&sjg);
     isValidCharch(&sjg);
+    isDiffMachineAndBoard(&sjg);
 
     if (aleajoueur()==0){
         *sj1=sjd;*sj2=sjg;}
