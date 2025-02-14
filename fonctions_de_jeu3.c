@@ -57,6 +57,12 @@ int checkAndHandleMoulinMACHINE(int iplace, char adversarySymbol, int *adversary
             choice = machineCapturePion0( adversarySymbol,  adversaryPawns);
         }
 
+        if (choice == -1){
+            do {
+                choice = rand() % SIZE;  // AI picks a random position
+            } while (!(board[choice] == adversarySymbol && (hasNonMoulinPawns ? !moulin(choice) : 1)));
+        }
+
         // Retirer le pion sélectionné
         printf("L'IA a capturé le pion en position %d\n", choice);
         board[choice] = 'O';
@@ -79,23 +85,6 @@ void TourDePlacementMACHINE( char adversarySymbol, int *adversaryPawns) {
     };
 }
 
-
-void TourDeMvtMACHINE(char adversarySymbol,  int *adversaryPawns) {
-    clear();
-    displayBoard();
-
-    int bestSource = getBestMoveMvt(board, 'm').from;
-    int bestDestination = getBestMoveMvt(board, 'm').to;
-    
-    move(bestSource, bestDestination, 'm');
-
-    // Vérifier si un moulin est formé et capturer un pion
-    if (moulin(bestDestination)) {
-        checkAndHandleMoulinMACHINE(bestDestination, adversarySymbol, adversaryPawns);
-    }
-}
-
-
 int getBestMovePlacement(char *board, char adversarySymbol) { 
     int bestMove = -1;
     int biggest_threat = -1;
@@ -111,157 +100,6 @@ int getBestMovePlacement(char *board, char adversarySymbol) {
     return bestMove;
 }
 
-Move getBestMoveMvt(char *board, char adversarySymbol) {
-    Move bestMove = {-1, -1};
-    int bestScore = -1; 
-
-    for (int i = 0; i < SIZE; i++) {
-        for (int j = 0; j < SIZE; j++){
-            if (board[i]== 'm' && board[j] == 'O' ) {
-                if (j == adjacences[i][0] || j == adjacences[i][1] || j == adjacences[i][2] || j == adjacences[i][3]){
-                    int score = threatMouvement(board, adversarySymbol, i, j);
-                    if (score > bestScore) {
-                        bestScore = score;
-                        bestMove.from = i;
-                        bestMove.to = j;
-                    }
-               }
-            }
-        }
-    }
-
-    return bestMove;
-}
-
-int machineCapturePion1(char adversarySymbol, int *adversaryPawns) {
-    
-    int hasNonMoulinPawns = 0;
-    for (int i = 0; i < SIZE; i++) {
-        if (board[i] == adversarySymbol && !moulin(i)) {
-            hasNonMoulinPawns = 1;
-            break;
-        }
-    }
-
-    // AI selects a valid piece to remove
-    int choice;
-
-    // Si des pions adverses sont hors moulin, l'IA enlève un pion libre
-    if (hasNonMoulinPawns) {
-        choice = bestcapture1(board, adversarySymbol);
-    }
-
-    board[choice] = 'O'; // AI retire le pion
-    (*adversaryPawns)--;
-    return choice;
-}
-
-int machineCapturePion0(char adversarySymbol, int *adversaryPawns) {
-
-    int hasNonMoulinPawns = 0;
-    for (int i = 0; i < SIZE; i++) {
-        if (board[i] == adversarySymbol && !moulin(i)) {
-            hasNonMoulinPawns = 1;
-            break;
-        }
-    }
-
-    // AI selects a valid piece to remove
-    int choice;
-    if (!hasNonMoulinPawns) {
-        choice = bestcapture0(board, adversarySymbol);
-        }
-
-    board[choice] = 'O';
-    (*adversaryPawns)--;
-    return choice;
-}
-
-
-int bestcapture1(char *board, char adversarySymbol) {
-    int best = -1;
-    int max = -100;
-
-    for (int k = 0; k < SIZE; k++) {
-        if (board[k] == adversarySymbol && !moulin(k)) {
-            int score = 20;
-            if (PionBloque(k, adversarySymbol, nbrspions1)) { // ne jamais prendre un pion bloque
-                score -= 5;
-            }
-
-            board[k] = 'O'; // On simule le retrait du pion
-            
-            // Simule le Mvt de l'adversaire
-            for (int i = 0; i < SIZE; i++) {
-                if (board[i] == adversarySymbol) {
-                    board[i] = 'O'; // On simule le retrait du pion
-                    if (doubleMoulinPossible2(board, adversarySymbol, i)) {
-                        score = -6;
-                    }
-                    board[i] = adversarySymbol; // Annuler le test
-                    for (int j = 0; j < SIZE; j++){
-                        if (board[i] == adversarySymbol && board[j] == 'O' ) {
-                            if (j == adjacences[i][0] || j == adjacences[i][1] || j == adjacences[i][2] || j == adjacences[i][3]){
-                                
-                                board[i] = 'O'; 
-                                board[j] = adversarySymbol; // Simuler un déplacement du symbole ici
-
-                                if (PionSemi_bloque(board, i, adversarySymbol, nbrspions1) && !moulindouble(adversarySymbol, nbrspions1)) { // ne jamais prendre un pion semi-bloque et ne faisant pas partie d'un double moulin
-                                    score -= 3;
-                                }
-
-                                if (moulindouble(adversarySymbol, nbrspions1)) { // prendre un pion faisant partie d'un double moulin
-                                    if (moulin(j)) {
-                                        score += 30;
-                                    }
-                                }
-
-                                if (MoulinAssure(board, adversarySymbol)) { // prendre un pion faisant partie d'un moulin assure
-                                    if (moulin(j)) {
-                                        score += 20;
-                                    }
-                                }
-
-                                board[i] = adversarySymbol; // Annuler le test
-                                board[j] = 'O'; // Annuler le test
-                            }           
-                        }
-                    }
-                }
-            }   
-            
-            if (score > max) {
-                max = score;
-                best = k;
-            }
-            board[k] = adversarySymbol; // Annuler le test
-        }
-    }
-    return best;
-}
-
-int bestcapture0(char *board, char adversarySymbol) {
-    int best = -1;
-    int max = -1;
-    for (int i = 0; i < SIZE; i++) {
-        if (board[i] == adversarySymbol) {
-            int score = 0;
-            for (int j = 0; j < 4 && adjacences[i][j] != -1; j++) {
-                int voisin = adjacences[i][j];
-                if (board[voisin] == 'O') {
-                    score++;
-                }
-            }
-            if (score > max) {
-                max = score;
-                best = i;
-            }
-        }
-    }
-    return best;
-}
-
-
 int threatPlacement(char *board, char adversarySymbol, int i) { 
     int score = 0;  // Initialiser le score à 0
 
@@ -269,7 +107,7 @@ int threatPlacement(char *board, char adversarySymbol, int i) {
         if (board[i] == 'O') {  // Vérifier si la case est vide 
             if (c==1){
                 if (MoulinAssureTableau[0] == i || MoulinAssureTableau[1] == i) {
-                    score += 11;  // Prioriser les cases qui forment un moulin assure pour l'adversaire
+                    score += 22;  // Prioriser les cases qui forment un moulin assure pour l'adversaire
                 }
             }
 
@@ -283,19 +121,19 @@ int threatPlacement(char *board, char adversarySymbol, int i) {
             // Vérifier si la machine peut se mettre en position pour faire un moulin assure au prochain tour
             board[i] = 'm'; // Simuler un placement du symbole ici
             if (MoulinAssure(board, 'm')) {
-                score += 13;  
+                score += 26;  
             }
             board[i] = 'O'; // Annuler le test
 
 
             // Vérifier si ce placement complète un moulin pour l'adversaire
             if (MoulinPossible(board, adversarySymbol, i)) {   
-                score += 20;  
+                score += 40;  
             } 
 
             // Vérifier si ce placement complète un moulin pour la machine
             if (MoulinPossible(board, 'm', i)) {   
-                score += 21;  
+                score += 42;  
             }
 
             // Verifier si la machine peut bloquer un pion de l'adversaire
@@ -357,25 +195,25 @@ int threatPlacement(char *board, char adversarySymbol, int i) {
 
         if (board[4] == adversarySymbol){
             if (i==1){
-                score += 4;
+                score += 1;
             }
         }
 
         if (board[10] == adversarySymbol){
             if (i==9){
-                score += 4;
+                score += 1;
             }
         }
 
         if (board[13] == adversarySymbol){
             if (i==14){
-                score += 4;
+                score += 1;
             }
         }
 
         if (board[19] == adversarySymbol){
             if (i==22){
-                score += 4;
+                score += 1;
             }
         }
 
@@ -396,131 +234,311 @@ int threatPlacement(char *board, char adversarySymbol, int i) {
     return score;  // Aucune menace détectée 
 }
 
+
+
+void TourDeMvtMACHINE(char adversarySymbol,  int *adversaryPawns) {
+    clear();
+    displayBoard();
+
+    Move bestMove = getBestMoveMvt(board, 'm');
+    int bestSource = bestMove.from;
+    int bestDestination = bestMove.to;
+
+    move(bestSource, bestDestination, 'm');
+
+    Sleep(5000);
+    // Vérifier si un moulin est formé et capturer un pion
+    if (moulin(bestDestination)) {
+        checkAndHandleMoulinMACHINE(bestDestination, adversarySymbol, adversaryPawns);
+    }
+}
+
+Move getBestMoveMvt(char *board, char adversarySymbol) {
+    Move bestMove = {-1, -1};
+    int bestScore = -5000000; 
+
+    for (int i = 0; i < SIZE; i++) {
+        for (int j = 0; j < SIZE; j++){
+            if (board[i]== 'm' && board[j] == 'O' ) {
+                if (j == adjacences[i][0] || j == adjacences[i][1] || j == adjacences[i][2] || j == adjacences[i][3]){
+                    int score = threatMouvement(board, adversarySymbol, i, j);
+                    if (score > bestScore) {
+                        bestScore = score;
+                        bestMove.from = i;
+                        bestMove.to = j;
+                    }
+               }
+            }
+        }
+    }
+
+    return bestMove;
+}
+
 int threatMouvement(char *board, char adversarySymbol, int source, int destination) {
     int score = 0;  // Initialiser le score à 0
+    for (int m = 0; m < 4 && adjacences[source][m] != -1; m++) {
+        if (adjacences[source][m] == destination && board[destination] == 'O') {
+            board[source] = 'O';
+            board[destination] = 'm'; // Simuler un déplacement du symbole ici
+            if (nbrspions1 <= 2 || (isBlocked(sj1) && nbrspions1 != 3)) { // Possibilite de perdre pour le joueur
+                return 30000; 
+            }
 
-        board[source] = 'O';
-        board[destination] = 'm'; // Simuler un déplacement du symbole ici
+            // Vérifier si le mouvement complète un moulin double pour le joueur  
+            if (moulindouble( 'm', nbrspions2)) {   
+                score += 40;  
+            }
+            
+            // Vérifier si le mouvement complète un moulin pour l'adversaire
+            if (moulindouble(adversarySymbol , nbrspions1)) {   
+                score -= 60;  
+            }
+            
+            for (int j = 0; j < 4 && adjacences[destination][j] != -1; j++) { // Vérifier les cases adjacentes
+                int voisin = adjacences[destination][j];  
 
-        if (nbrspions1 <= 2 || (isBlocked(sj1) && nbrspions1 != 3)) { // Possibilite de perdre pour le joueur
-            return 50000; 
-        }
-
-        // Simule le Mvt de l'adversaire
-        for (int i = 0; i < SIZE; i++) {
-            for (int j = 0; j < SIZE; j++){
-                if (board[i]== adversarySymbol && board[j] == 'O' ) {
-                    if (j == adjacences[i][0] || j == adjacences[i][1] || j == adjacences[i][2] || j == adjacences[i][3]){
-                        
-                        board[i] = 'O';
-                        board[j] = adversarySymbol; // Simuler un déplacement du symbole ici
-                        if (nbrspions2 <= 2 || (isBlocked(sj2) && nbrspions2 != 3)) { // Possibilte de perdre pour la machine
-                            board[i]== adversarySymbol;
-                            board[j] == 'O';
-                            return -50000;
+                if (board[voisin] == adversarySymbol){  // Verifier si la machine peut bloquer un pion faisant partie d'un moulin de l'adversaire
+                    if (moulin(voisin)) { 
+                        if (PionBloque(voisin, adversarySymbol, nbrspions1)) { 
+                            score += 14;
                         }
-
-                        if (moulindouble( adversarySymbol, nbrspions1)) {   // Verifier si le mouvement complète un moulin double pour le joueur
-                            score -= 20;
-                            if (moulin(destination)){ // verifier la machine peut faire un moulin et par consequent detruire le potentiel double moulin
-                                score += 80;
-                            }
-                        }
-
-                        if (MoulinAssure(board, adversarySymbol)) {   // Verifier si le mouvement complète un moulin assure pour le joueur
-                            score -= 12; 
-                            if (moulin(destination)){ // verifier la machine peut faire un moulin et par consequent detruire le potentiel double moulin
-                                score += 60;
-                            } 
-                        }
-                        for (int j = 0; j < 4 && adjacences[destination][j] != -1; j++) { // Vérifier les cases adjacentes
-                            int voisin = adjacences[destination][j];
-
-                            if (moulin(voisin)) {  // Verifier s'il forme un moulin et bloque un pion de l'adversaire
-
-                                if (PionBloque(voisin, adversarySymbol, nbrspions1)) { 
-                                    score -= 10;
-                                }
-                            }
-                            if (board[voisin] == 'm'){
-                                if (PionBloque(voisin, 'm', nbrspions2)) {  // Verifier si le joueur peut bloquer un pion de l'adversaire
-                                    score -= 4;
-                                }
-
-                                if (PionSemi_bloque(board, voisin, 'm', nbrspions2)) { // Verifier si le joueur peut semi-bloquer un pion de la machine
-                                    score -= 3;
-                                }
-                            }
-                        }
-                        
-                        board[i] = adversarySymbol; // Annuler le test
-                        board[j] = 'O'; // Annuler le test
                     }
                 }
-            }
-        }
-        // Vérifier si le mouvement complète un moulin double pour le joueur  
-        if (moulindouble( 'm', nbrspions2)) {   
-            score += 40;  
-        }
-        
-        // Vérifier si le mouvement complète un moulin pour l'adversaire
-        if (moulindouble(adversarySymbol , nbrspions1)) {   
-            score -= 60;  
-        }
-        
-        for (int j = 0; j < 4 && adjacences[destination][j] != -1; j++) { // Vérifier les cases adjacentes
-            int voisin = adjacences[destination][j];  
-
-            if (board[voisin] == adversarySymbol){  // Verifier si la machine peut bloquer un pion faisant partie d'un moulin de l'adversaire
-                if (moulin(voisin)) { 
+                if (board[voisin] == 'm'){  // Verifier si la machine peut bloquer un pion faisant partie d'un moulin de la machine
+                    if (moulin(voisin)) { 
+                        if (PionBloque(voisin, adversarySymbol, nbrspions1)) { 
+                            score -= 6;
+                        }
+                    }
+                }
+                if (board[voisin] == adversarySymbol){  // Verifier si la machine peut bloquer un pion de l'adversaire
                     if (PionBloque(voisin, adversarySymbol, nbrspions1)) { 
-                        score += 14;
+                        score += 5;
+                    }
+                } 
+                if (board[voisin] == 'm'){    
+                    if (PionBloque(voisin, 'm', nbrspions2)) { // Verifier si la machine peut bloquer un pion de la machine
+                        score -= 4;
+                    }
+                    if (PionSemi_bloque(board, voisin, 'm', nbrspions2)) { // Verifier si la machine peut Semi-bloquer un pion de la machine
+                        score -= 3;
                     }
                 }
-            }
-            if (board[voisin] == 'm'){  // Verifier si la machine peut bloquer un pion faisant partie d'un moulin de la machine
-                if (moulin(voisin)) { 
-                    if (PionBloque(voisin, adversarySymbol, nbrspions1)) { 
-                        score -= 6;
+                if (board[voisin] == adversarySymbol){  
+                    if (PionSemi_bloque(board, voisin, adversarySymbol, nbrspions1)) { // Verifier si la machine peut semi-bloquer un pion de l'adversaire
+                        score += 3;
                     }
-                }
-            }
-            if (board[voisin] == adversarySymbol){  // Verifier si la machine peut bloquer un pion de l'adversaire
-                if (PionBloque(voisin, adversarySymbol, nbrspions1)) { 
-                    score += 5;
                 }
             } 
-            if (board[voisin] == 'm'){    
-                if (PionBloque(voisin, 'm', nbrspions2)) { // Verifier si la machine peut bloquer un pion de la machine
-                    score -= 4;
-                }
-                if (PionSemi_bloque(board, voisin, 'm', nbrspions2)) { // Verifier si la machine peut Semi-bloquer un pion de la machine
-                    score -= 3;
-                }
-            }
-            if (board[voisin] == adversarySymbol){  
-                if (PionSemi_bloque(board, voisin, adversarySymbol, nbrspions1)) { // Verifier si la machine peut semi-bloquer un pion de l'adversaire
-                    score += 3;
+
+            if (moulindouble( adversarySymbol, nbrspions1)) {   // Verifier si le mouvement complète un moulin double pour le joueur
+                score -= 20;
+                if (moulin(destination)){ // verifier la machine peut faire un moulin et par consequent detruire le potentiel double moulin
+                    score += 80;
                 }
             }
-        } 
-        score += 1;  // Pour eviter qu'aucun mouvement ne soit fait
+            int maxScoremax = -30000;
+            // Simule le Mvt de l'adversaire
+            for (int i = 0; i < SIZE; i++) {
+                for (int j = 0; j < SIZE; j++){
+                    if (board[i]== adversarySymbol && board[j] == 'O' ) {
+                        if (j == adjacences[i][0] || j == adjacences[i][1] || j == adjacences[i][2] || j == adjacences[i][3]){
+                            int scoremax = 0;
+                            board[i] = 'O';
+                            board[j] = adversarySymbol; // Simuler un déplacement du symbole ici
+                            if (nbrspions2 <= 2 || (isBlocked(sj2) && nbrspions2 != 3)) { // Possibilte de perdre pour la machine
+                                board[i] = adversarySymbol;
+                                board[j] = 'O';
+                                return -30000;
+                            }
+
+                            
+
+                            if (MoulinAssure(board, adversarySymbol)) {   // Verifier si le mouvement complète un moulin assure pour le joueur
+                                scoremax -= 12; 
+                                if (moulin(destination)){ // verifier la machine peut faire un moulin et par consequent detruire le potentiel double moulin
+                                    scoremax += 60;
+                                } 
+                            }
+                            for (int j = 0; j < 4 && adjacences[destination][j] != -1; j++) { // Vérifier les cases adjacentes
+                                int voisin = adjacences[destination][j];
+
+                                if (moulin(voisin)) {  // Verifier s'il forme un moulin et bloque un pion de l'adversaire
+
+                                    if (PionBloque(voisin, adversarySymbol, nbrspions1)) { 
+                                        scoremax -= 10;
+                                    }
+                                }
+                                if (board[voisin] == 'm'){
+                                    if (PionBloque(voisin, 'm', nbrspions2)) {  // Verifier si le joueur peut bloquer un pion de l'adversaire
+                                        scoremax -= 4;
+                                    }
+
+                                    if (PionSemi_bloque(board, voisin, 'm', nbrspions2)) { // Verifier si le joueur peut semi-bloquer un pion de la machine
+                                        scoremax -= 3;
+                                    }
+                                }
+                            }
+                            if(scoremax > maxScoremax){
+                                maxScoremax = scoremax;
+                            }
+                            
+                            board[i] = adversarySymbol; // Annuler le test
+                            board[j] = 'O'; // Annuler le test
+                        }
+                    }
+                }
+            }
+
+            score += maxScoremax;
+
+            board[destination] = 'O'; // Annuler le test
+            board[source] = 'm'; // Annuler le test
 
 
-        board[destination] = 'O'; // Annuler le test
-        board[source] = 'm'; // Annuler le test
 
 
+            // prioriser les cases centrales
+            if (destination == 4 || destination == 10 || destination == 13 || destination == 19) {
+                score += 4;
+            }
+        }
+        return score;  // Aucune menace détectée
+    }
+}
 
 
-        // prioriser les cases centrales
-        if (destination == 4 || destination == 10 || destination == 13 || destination == 19) {
-            score += 4;
+int machineCapturePion1(char adversarySymbol, int *adversaryPawns) {
+    int hasNonMoulinPawns = 0;
+    for (int i = 0; i < SIZE; i++) {
+        if (board[i] == adversarySymbol && !moulin(i)) {
+            hasNonMoulinPawns = 1;
+            break;
+        }
+    }
+
+    int choice;
+    if (hasNonMoulinPawns) {
+        choice = bestcapture01(board, adversarySymbol);
+    } 
+    // Check if a valid pawn was selected. If not, choose a random valid pawn.
+    if (choice == -1) {
+        do {
+            choice = rand() % SIZE;
+        } while (!(board[choice] == adversarySymbol && (hasNonMoulinPawns ? !moulin(choice) : 1)));
+    }
+
+    board[choice] = 'O';
+    (*adversaryPawns)--;
+    return choice;
+}
+
+int machineCapturePion0(char adversarySymbol, int *adversaryPawns) {
+
+    int hasNonMoulinPawns = 0;
+    for (int i = 0; i < SIZE; i++) {
+        if (board[i] == adversarySymbol && !moulin(i)) {
+            hasNonMoulinPawns = 1;
+            break;
+        }
+    }
+
+    // AI selects a valid piece to remove
+    int choice;
+    if (!hasNonMoulinPawns) {
+        choice = bestcapture0(board, adversarySymbol);
         }
 
-        return score;  // Aucune menace détectée
+    board[choice] = 'O';
+    (*adversaryPawns)--;
+    return choice;
 }
+
+
+int bestcapture1(char *board, char adversarySymbol) {
+    int best = -1;
+    int max = -30000;
+
+    for (int k = 0; k < SIZE; k++) {
+        if (board[k] == adversarySymbol && !moulin(k)) {
+            int score = 20;
+            if (PionBloque(k, adversarySymbol, nbrspions1)) { // ne jamais prendre un pion bloque
+                score -= 5;
+            }
+
+            board[k] = 'O'; // On simule le retrait du pion
+            if (doubleMoulinPossible2(board, adversarySymbol, k)) {
+                score = -6;
+            }
+            
+            int maxScoremax = -40000;
+            // Simule le Mvt de l'adversaire
+            for (int i = 0; i < SIZE; i++) {
+                if (board[i] == adversarySymbol) {
+                    for (int j = 0; j < SIZE; j++){
+                        if (board[j] == 'O' ) {
+                            if (j == adjacences[i][0] || j == adjacences[i][1] || j == adjacences[i][2] || j == adjacences[i][3]){
+                                int scoremax = 0;
+                                board[i] = 'O'; 
+                                board[j] = adversarySymbol; // Simuler un déplacement du symbole ici
+
+                                if (PionSemi_bloque(board, i, adversarySymbol, nbrspions1) && !moulindouble(adversarySymbol, nbrspions1)) { // ne jamais prendre un pion semi-bloque et ne faisant pas partie d'un double moulin
+                                    scoremax -= 3;
+                                }
+
+                                if (moulindouble(adversarySymbol, nbrspions1)) { // prendre un pion faisant partie d'un double moulin
+                                    if (moulin(j)) {
+                                        scoremax += 30;
+                                    }
+                                }
+
+                                if (MoulinAssure(board, adversarySymbol)) { // prendre un pion faisant partie d'un moulin assure
+                                    if (moulin(j)) {
+                                        scoremax += 20;
+                                    }
+                                }
+
+                                if (scoremax > maxScoremax) {
+                                    maxScoremax = scoremax;
+                                }
+
+                                board[i] = adversarySymbol; // Annuler le test
+                                board[j] = 'O'; // Annuler le test
+                                
+                            }           
+                        }
+                    }
+                }
+                
+            }   
+            score += maxScoremax;
+            if (score > max) {
+                max = score;
+                best = k;
+            } 
+            board[k] = adversarySymbol; // Annuler le test
+        }
+    }
+    return best;
+}
+
+int bestcapture0(char *board, char adversarySymbol) {
+    int choice = -1;
+    do {
+        choice = rand() % SIZE;  // AI picks a random position
+    } while (!board[choice] == adversarySymbol );
+    return choice;
+}
+
+int bestcapture01(char *board, char adversarySymbol) {
+    int choice = -1;
+    do {
+        choice = rand() % SIZE;  // AI picks a random position
+    } while (!board[choice] == adversarySymbol && moulin(choice)); // ne jamais prendre un pion faisant partie d'un moulin;
+    return choice;
+}
+
 
 
 
@@ -544,7 +562,7 @@ int doubleMoulinPossible2(char *board, char symbol, int k) {
             for (int i = 0; i < SIZE; i++) {
                 for (int j = 0; j < SIZE; j++){
                     for (int m = 0; m < 4 && adjacences[i][m] != -1; m++) {
-                        int voisin = adjacences[i][j]; // Pour savoi si le moulin peut etre prevenu
+                        int voisin = adjacences[i][m]; // Pour savoi si le moulin peut etre prevenu
                         char charvoisin = board[voisin];
                         if (charvoisin != symbol){
                             if (board[i]== 'm' && board[j] == 'O' ) { // pour s'assurer que le move est possible
